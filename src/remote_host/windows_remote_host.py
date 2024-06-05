@@ -329,7 +329,7 @@ class WindowsRemoteHost(BaseRemoteHost):
             _, stdout, _ = self.powershell(command=command_x64, expected_exit_code=0)
 
             parse_stdout(stdout)
-        except:
+        except RuntimeError:
             pass
 
         return installed_software
