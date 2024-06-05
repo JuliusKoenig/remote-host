@@ -228,12 +228,7 @@ class WindowsRemoteHost(BaseRemoteHost):
                 continue
             logger.debug(f"stderr: {line}")
 
-        # check exit status
-        if exit_code != expected_exit_code:
-            logger.error(f"Command '{command}' on {self} has exit status '{exit_code}' but expected exit status is '{expected_exit_code}'.")
-            return False, stdout_lines, stderr_lines
-
-        return True, stdout_lines, stderr_lines
+        return exit_code, stdout_lines, stderr_lines
 
     def execute_file(self,
                      local_file_path: Path,
