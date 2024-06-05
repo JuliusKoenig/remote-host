@@ -357,7 +357,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
             if __ba_result__[0] == expected_exit_code:
                 logger.info(f"Command '{command}' executed successfully on {self}.")
             else:
-                raise
+                raise RuntimeError(f"Command '{command}' failed on {self}.")
 
     @abstractmethod
     @wrap(before=before_execute_command, after=after_execute_command)
