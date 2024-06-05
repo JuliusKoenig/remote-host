@@ -16,7 +16,7 @@ job("Build and publish Package") {
     // download python image
     container(displayName = "Python", image = "python:3.12-bookworm") {
         // run python script
-        env["pypi_token"] = "{{ project:pypi_remote-host }}"
+        env["pypi_token"] = "{{ project:pypi_token_remote-host }}"
         shellScript {
             content = """
                 echo "----- Install pdm -----"
