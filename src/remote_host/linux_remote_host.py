@@ -141,7 +141,7 @@ class LinuxRemoteHost(BaseRemoteHost):
 
     def execute_command(self,
                         command: str,
-                        expected_exit_code: int = 0) -> tuple[bool, list[str], list[str]]:
+                        expected_exit_code: int | None = 0) -> tuple[bool, list[str], list[str]]:
         # execute command
         stdin, stdout, stderr = self.client.exec_command(command)
 
@@ -181,7 +181,7 @@ class LinuxRemoteHost(BaseRemoteHost):
     def execute_file(self,
                      local_file_path: Path,
                      remote_path: str = "",
-                     expected_exit_code: int = 0,
+                     expected_exit_code: int | None = 0,
                      overwrite: bool = False) -> tuple[int, list[str], list[str]]:
 
         # put local file to remote host

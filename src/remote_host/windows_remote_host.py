@@ -6,6 +6,7 @@ from pathlib import Path
 from pypsexec.client import Client
 from smb.SMBConnection import SMBConnection
 
+from remote_host import DirectoryObject, FileObject
 from remote_host.base_remote_host import BaseRemoteHost
 
 logger = logging.getLogger(__name__)
@@ -200,7 +201,7 @@ class WindowsRemoteHost(BaseRemoteHost):
     def delete_dir(self, remote_dir_path: str, recursive: bool = False) -> None:
         self.smb_connection.deleteDirectory(self.share, remote_dir_path)
 
-    def execute_command(self, command: str, expected_exit_code: int = 0) -> tuple[int, list[str], list[str]]:
+    def execute_command(self, command: str, expected_exit_code: int | None = 0) -> tuple[int, list[str], list[str]]:
         executable = command.split(" ")[0]
         arguments = " ".join(command.split(" ")[1:])
 
@@ -237,7 +238,7 @@ class WindowsRemoteHost(BaseRemoteHost):
     def execute_file(self,
                      local_file_path: Path,
                      remote_path: str = "",
-                     expected_exit_code: int = 0,
+                     expected_exit_code: int | None = 0 ,
                      overwrite: bool = False) -> tuple[int, list[str], list[str]]:
 
         # put local file to remote host
@@ -254,12 +255,12 @@ class WindowsRemoteHost(BaseRemoteHost):
 
     def cmd(self,
             command: str,
-            expected_exit_code: int = 0) -> tuple[int, list[str], list[str]]:
+            expected_exit_code: int | None  = 0) -> tuple[int, list[str], list[str]]:
         """
         Execute command on Remote Host.
 
         :param command: Command to execute.
-        :param expected_exit_code: Expected exit code of command.
+        :param expected_exit_code: Expected exit code of command. If None, no check will be done. Default: 0
         :return: True if command was executed successfully.
         """
 
@@ -269,12 +270,12 @@ class WindowsRemoteHost(BaseRemoteHost):
 
     def powershell(self,
                    command: str,
-                   expected_exit_code: int = 0) -> tuple[int, list[str], list[str]]:
+                   expected_exit_code: int | None  = 0) -> tuple[int, list[str], list[str]]:
         """
         Execute command on Remote Host.
 
         :param command: Command to execute.
-        :param expected_exit_code: Expected exit code of command.
+        :param expected_exit_code: Expected exit code of command. If None, no check will be done. Default: 0
         :return: True if command was executed successfully.
         """
 

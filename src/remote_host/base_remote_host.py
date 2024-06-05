@@ -352,22 +352,23 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
     def before_execute_command(self, command: str, *_, **__):
         logger.debug(f"Execute command '{command}' on {self}.")
 
-    def after_execute_command(self, command: str, __ba_result__: tuple[int, list[str], list[str]], *_, expected_exit_code: int = 0, **__):
-        if __ba_result__[0] == expected_exit_code:
-            logger.info(f"Command '{command}' executed successfully on {self}.")
-        else:
-            logger.error(f"Command '{command}' failed on {self}.")
+    def after_execute_command(self, command: str, __ba_result__: tuple[int, list[str], list[str]], *_, expected_exit_code: int | None = 0, **__):
+        if expected_exit_code is not None:
+            if __ba_result__[0] == expected_exit_code:
+                logger.info(f"Command '{command}' executed successfully on {self}.")
+            else:
+                logger.error(f"Command '{command}' failed on {self}.")
 
     @abstractmethod
     @wrap(before=before_execute_command, after=after_execute_command)
     def execute_command(self,
                         command: str,
-                        expected_exit_code: int = 0) -> tuple[int, list[str], list[str]]:
+                        expected_exit_code: int | None = 0) -> tuple[int, list[str], list[str]]:
         """
         Execute a command on the remote host.
 
         :param command: Command to execute
-        :param expected_exit_code: Expected exit code. Default is 0
+        :param expected_exit_code: Expected exit code. If None, no check will be done. Default is 0
         :return: Exit code, stdout and stderr
         """
         ...
@@ -375,18 +376,19 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
     def before_execute_file(self, local_file_path: Path, *_, **__):
         logger.debug(f"Execute file '{local_file_path}' on {self}.")
 
-    def after_execute_file(self, local_file_path: Path, __ba_result__: tuple[int, list[str], list[str]], *_, **__):
-        if __ba_result__[0] == 0:
-            logger.info(f"File '{local_file_path}' executed successfully on {self}.")
-        else:
-            logger.error(f"File '{local_file_path}' failed on {self}.")
+    def after_execute_file(self, local_file_path: Path, __ba_result__: tuple[int, list[str], list[str]], *_, expected_exit_code: int | None = 0, **__):
+        if expected_exit_code is not None:
+            if __ba_result__[0] == expected_exit_code:
+                logger.info(f"File '{local_file_path}' executed successfully on {self}.")
+            else:
+                raise RuntimeError(f"File '{local_file_path}' failed on {self}.")
 
     @abstractmethod
     @wrap(before=before_execute_file, after=after_execute_file)
     def execute_file(self,
                      local_file_path: Path,
                      remote_path: str = "",
-                     expected_exit_code: int = 0,
+                     expected_exit_code: int | None = 0,
                      overwrite: bool = False) -> tuple[int, list[str], list[str]]:
         """
         Copy a file from the local machine to the remote machine
@@ -394,7 +396,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
 
         :param local_file_path: Local file path
         :param remote_path: Path on the remote machine
-        :param expected_exit_code: Expected exit code. Default is 0
+        :param expected_exit_code: Expected exit code. If None, no check will be done. Default is 0
         :param overwrite: Overwrite remote file if it exists
 
         :return: True if the file was copied and executed successfully, False otherwise
