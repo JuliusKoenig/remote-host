@@ -215,15 +215,17 @@ class WindowsRemoteHost(BaseRemoteHost):
         stdout_str = stdout.decode("utf-8", errors="ignore")
         stderr_str = stderr.decode("utf-8", errors="ignore")
 
-        stdout_lines = stdout_str.split("\r\n")
-        stderr_lines = stderr_str.split("\r\n")
+        stdout_lines = stdout_str.split("\n")
+        stderr_lines = stderr_str.split("\n")
 
         for line in stdout_lines:
+            line = line.strip()
             if len(stdout_lines) == 1 and line == "":
                 continue
             logger.debug(f"stdout: {line}")
 
         for line in stderr_lines:
+            line = line.strip()
             if len(stderr_lines) == 1 and line == "":
                 continue
             logger.debug(f"stderr: {line}")
@@ -289,8 +291,8 @@ class WindowsRemoteHost(BaseRemoteHost):
 
         installed_software = []
 
-        def parse_stdout(_stdout: list[str]):
-            for line in _stdout:
+        def parse_stdout():
+            for line in stdout:
                 if line == "_-__-_" or "_-_" not in line:
                     continue
                 line_split = line.split("_-_")
@@ -318,7 +320,7 @@ class WindowsRemoteHost(BaseRemoteHost):
 
         _, stdout, _ = self.powershell(command=command_x86, expected_exit_code=0)
 
-        parse_stdout(stdout)
+        parse_stdout()
 
         command_x64 = ("$InstalledSoftware = Get-ChildItem \"HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\"; "
                        "foreach($obj in $InstalledSoftware){write-host $obj.GetValue('DisplayName')-NoNewline; "
@@ -328,7 +330,7 @@ class WindowsRemoteHost(BaseRemoteHost):
         try:
             _, stdout, _ = self.powershell(command=command_x64, expected_exit_code=0)
 
-            parse_stdout(stdout)
+            parse_stdout()
         except RuntimeError:
             pass
 
