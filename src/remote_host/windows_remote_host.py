@@ -152,7 +152,7 @@ class WindowsRemoteHost(BaseRemoteHost):
 
     def is_exists(self, remote_path: str) -> bool:
         remote_path = remote_path.replace("\\", "/")
-        remote_path_parent = str(Path(remote_path).parent)
+        remote_path_parent = str(Path(remote_path).parent).replace("\\", "/")
         if remote_path_parent == ".":
             remote_path_parent = ""
         for obj in self.list_dir(remote_path_parent):
@@ -162,7 +162,7 @@ class WindowsRemoteHost(BaseRemoteHost):
 
     def is_file_exists(self, remote_file_path: str) -> bool:
         remote_file_path = remote_file_path.replace("\\", "/")
-        remote_file_parent = str(Path(remote_file_path).parent)
+        remote_file_parent = str(Path(remote_file_path).parent).replace("\\", "/")
         if remote_file_parent == ".":
             remote_file_parent = ""
         for obj in self.list_dir(remote_file_parent):
@@ -185,7 +185,7 @@ class WindowsRemoteHost(BaseRemoteHost):
 
     def is_dir_exists(self, remote_dir_path: str) -> bool:
         remote_dir_path = remote_dir_path.replace("\\", "/")
-        remote_dir_parent = str(Path(remote_dir_path).parent)
+        remote_dir_parent = str(Path(remote_dir_path).parent).replace("\\", "/")
         if remote_dir_parent == ".":
             remote_dir_parent = ""
         for obj in self.list_dir(remote_dir_parent):
