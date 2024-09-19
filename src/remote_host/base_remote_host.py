@@ -44,6 +44,17 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
         if self.is_connected:
             self.disconnect()
 
+    def __enter__(self) -> "BaseRemoteHost":
+        # connect to host
+        self.connect()
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        # disconnect from host
+        if self.is_connected:
+            self.disconnect()
+
     def _check_ping(self) -> None:
         if not wait_ping(host=self.host, timeout=1, count=self.check_ping_timeout, verbose=self.check_ping_verbose):
             raise RuntimeError(f"Remote host {self} is not pingable.")

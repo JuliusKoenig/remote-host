@@ -40,6 +40,11 @@ class WindowsRemoteHost(BaseRemoteHost):
                          check_ping_verbose=check_ping_verbose,
                          check_port=check_port)
 
+    def __enter__(self) -> "WindowsRemoteHost":
+        super().__enter__()
+
+        return self
+
     @property
     def domain(self) -> str:
         """

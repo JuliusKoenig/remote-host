@@ -34,6 +34,11 @@ class LinuxRemoteHost(BaseRemoteHost):
                          check_ping_verbose=check_ping_verbose,
                          check_port=check_port)
 
+    def __enter__(self) -> "LinuxRemoteHost":
+        super().__enter__()
+
+        return self
+
     @property
     def ssl_verify_hostname(self) -> bool:
         """
