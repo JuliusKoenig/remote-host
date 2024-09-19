@@ -3,6 +3,7 @@ import socket
 from abc import ABC, abstractmethod
 from ipaddress import IPv4Address
 from pathlib import Path
+from typing import Union, Optional
 
 from wiederverwendbar.before_after_wrap import wrap, WrappedClass
 from wiederverwendbar.functions.wait_ping import wait_ping
@@ -18,7 +19,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
     """
 
     def __init__(self,
-                 host: str | IPv4Address,
+                 host: Union[str, IPv4Address],
                  username: str,
                  password: str,
                  port: int,
@@ -168,7 +169,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
 
     @abstractmethod
     @wrap(before=before_list_dir, after=after_list_dir)
-    def list_dir(self, remote_dir_path: str) -> list[DirectoryObject | FileObject]:
+    def list_dir(self, remote_dir_path: str) -> list[Union[DirectoryObject, FileObject]]:
         """
         List directory on Remote Host.
 
@@ -363,7 +364,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
     def before_execute_command(self, command: str, *_, **__):
         logger.debug(f"Execute command '{command}' on {self}.")
 
-    def after_execute_command(self, command: str, __ba_result__: tuple[int, list[str], list[str]], *_, expected_exit_code: int | None = 0, **__):
+    def after_execute_command(self, command: str, __ba_result__: tuple[int, list[str], list[str]], *_, expected_exit_code: Optional[int] = 0, **__):
         if expected_exit_code is not None:
             if __ba_result__[0] == expected_exit_code:
                 logger.info(f"Command '{command}' executed successfully on {self}.")
@@ -374,7 +375,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
     @wrap(before=before_execute_command, after=after_execute_command)
     def execute_command(self,
                         command: str,
-                        expected_exit_code: int | None = 0) -> tuple[int, list[str], list[str]]:
+                        expected_exit_code: Optional[int] = 0) -> tuple[int, list[str], list[str]]:
         """
         Execute a command on the remote host.
 
@@ -387,7 +388,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
     def before_execute_file(self, local_file_path: Path, *_, **__):
         logger.debug(f"Execute file '{local_file_path}' on {self}.")
 
-    def after_execute_file(self, local_file_path: Path, __ba_result__: tuple[int, list[str], list[str]], *_, expected_exit_code: int | None = 0, **__):
+    def after_execute_file(self, local_file_path: Path, __ba_result__: tuple[int, list[str], list[str]], *_, expected_exit_code: Optional[int] = 0, **__):
         if expected_exit_code is not None:
             if __ba_result__[0] == expected_exit_code:
                 logger.info(f"File '{local_file_path}' executed successfully on {self}.")
@@ -399,7 +400,7 @@ class BaseRemoteHost(ABC, metaclass=WrappedClass):
     def execute_file(self,
                      local_file_path: Path,
                      remote_path: str = "",
-                     expected_exit_code: int | None = 0,
+                     expected_exit_code: Optional[int] = 0,
                      overwrite: bool = False) -> tuple[int, list[str], list[str]]:
         """
         Copy a file from the local machine to the remote machine

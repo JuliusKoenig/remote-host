@@ -1,6 +1,7 @@
 import logging
 from ipaddress import IPv4Address
 from pathlib import Path
+from typing import Union, Optional
 
 import paramiko
 from wiederverwendbar.before_after_wrap import wrap
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class LinuxRemoteHost(BaseRemoteHost):
     def __init__(self,
-                 host: str | IPv4Address,
+                 host: Union[str, IPv4Address],
                  username: str,
                  password: str,
                  port: int = 22,
@@ -72,7 +73,7 @@ class LinuxRemoteHost(BaseRemoteHost):
             raise RuntimeError(f"Not connected to {self}.")
         return self._client
 
-    def list_dir(self, remote_dir_path: str) -> list[DirectoryObject | FileObject]:
+    def list_dir(self, remote_dir_path: str) -> list[Union[DirectoryObject, FileObject]]:
         objs = []
 
         first_line = True
@@ -146,7 +147,7 @@ class LinuxRemoteHost(BaseRemoteHost):
 
     def execute_command(self,
                         command: str,
-                        expected_exit_code: int | None = 0) -> tuple[bool, list[str], list[str]]:
+                        expected_exit_code: Optional[int] = 0) -> tuple[bool, list[str], list[str]]:
         # execute command
         stdin, stdout, stderr = self.client.exec_command(command)
 
@@ -186,7 +187,7 @@ class LinuxRemoteHost(BaseRemoteHost):
     def execute_file(self,
                      local_file_path: Path,
                      remote_path: str = "",
-                     expected_exit_code: int | None = 0,
+                     expected_exit_code: Optional[int] = 0,
                      overwrite: bool = False) -> tuple[int, list[str], list[str]]:
 
         # put local file to remote host

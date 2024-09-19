@@ -2,6 +2,7 @@ import logging
 import time
 from ipaddress import IPv4Address
 from pathlib import Path
+from typing import Union, Optional
 
 from pypsexec.client import Client
 from smb.SMBConnection import SMBConnection
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class WindowsRemoteHost(BaseRemoteHost):
     def __init__(self,
-                 host: str | IPv4Address,
+                 host: Union[str, IPv4Address],
                  username: str,
                  password: str,
                  domain: str = "",
@@ -28,8 +29,8 @@ class WindowsRemoteHost(BaseRemoteHost):
         self._domain = domain
         self._share = share
         self._encryption = encryption
-        self._smb_connection: SMBConnection | None = None
-        self._client: Client | None = None
+        self._smb_connection: Optional[SMBConnection] = None
+        self._client: Optional[Client] = None
 
         super().__init__(host=host,
                          username=username,
@@ -140,7 +141,7 @@ class WindowsRemoteHost(BaseRemoteHost):
             raise RuntimeError(f"Not connected to {self}.")
         return self._client
 
-    def list_dir(self, remote_dir_path: str) -> list[DirectoryObject | FileObject]:
+    def list_dir(self, remote_dir_path: str) -> list[Union[DirectoryObject, FileObject]]:
         objs = []
 
         for file in self.smb_connection.listPath(self.share, remote_dir_path):
@@ -206,7 +207,7 @@ class WindowsRemoteHost(BaseRemoteHost):
     def delete_dir(self, remote_dir_path: str, recursive: bool = False) -> None:
         self.smb_connection.deleteDirectory(self.share, remote_dir_path)
 
-    def execute_command(self, command: str, expected_exit_code: int | None = 0) -> tuple[int, list[str], list[str]]:
+    def execute_command(self, command: str, expected_exit_code: Optional[int] = 0) -> tuple[int, list[str], list[str]]:
         executable = command.split(" ")[0]
         arguments = " ".join(command.split(" ")[1:])
 
@@ -240,7 +241,7 @@ class WindowsRemoteHost(BaseRemoteHost):
     def execute_file(self,
                      local_file_path: Path,
                      remote_path: str = "",
-                     expected_exit_code: int | None = 0 ,
+                     expected_exit_code: Optional[int] = 0,
                      overwrite: bool = False) -> tuple[int, list[str], list[str]]:
 
         # put local file to remote host
@@ -257,7 +258,7 @@ class WindowsRemoteHost(BaseRemoteHost):
 
     def cmd(self,
             command: str,
-            expected_exit_code: int | None  = 0) -> tuple[int, list[str], list[str]]:
+            expected_exit_code: Optional[int] = 0) -> tuple[int, list[str], list[str]]:
         """
         Execute command on Remote Host.
 
@@ -272,7 +273,7 @@ class WindowsRemoteHost(BaseRemoteHost):
 
     def powershell(self,
                    command: str,
-                   expected_exit_code: int | None  = 0) -> tuple[int, list[str], list[str]]:
+                   expected_exit_code: Optional[int] = 0) -> tuple[int, list[str], list[str]]:
         """
         Execute command on Remote Host.
 
@@ -361,7 +362,7 @@ class WindowsRemoteHost(BaseRemoteHost):
         logger.debug(f"Software '{software}' is not installed on {self}.")
         return False
 
-    def get_uninstall_string(self, software: str) -> str | None:
+    def get_uninstall_string(self, software: str) -> Optional[str]:
         """
         Get uninstall string of software on Remote Host.
 
